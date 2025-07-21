@@ -6,7 +6,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/ethpandaops/ethereum-metrics-exporter/cmd"
+	"github.com/trmaphi/bcos-metrics-exporter/cmd"
 )
 
 func main() {

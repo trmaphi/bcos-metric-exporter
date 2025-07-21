@@ -69,13 +69,13 @@ helm install ethereum-metrics-exporter ethereum-helm-charts/ethereum-metrics-exp
 
 ### Standalone
 **Downloading a release**
-Available [here](https://github.com/ethpandaops/ethereum-metrics-exporter/releases)
+Available [here](https://github.com/trmaphi/bcos-metrics-exporter/releases)
 
 **Building yourself (requires Go)**
 
 1. Clone the repo
    ```sh
-   go get github.com/ethpandaops/ethereum-metrics-exporter
+   go get github.com/trmaphi/bcos-metrics-exporter
    ```
 2. Change directories
    ```sh

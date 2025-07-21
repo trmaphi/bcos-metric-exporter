@@ -1,4 +1,4 @@
-module github.com/ethpandaops/ethereum-metrics-exporter
+module github.com/trmaphi/bcos-metrics-exporter
 
 go 1.22
 

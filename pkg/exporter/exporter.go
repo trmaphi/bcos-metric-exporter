@@ -8,10 +8,10 @@ import (
 	"time"
 
 	"github.com/ethpandaops/beacon/pkg/beacon"
-	"github.com/ethpandaops/ethereum-metrics-exporter/pkg/exporter/disk"
-	"github.com/ethpandaops/ethereum-metrics-exporter/pkg/exporter/execution"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
+	"github.com/trmaphi/bcos-metrics-exporter/pkg/exporter/disk"
+	"github.com/trmaphi/bcos-metrics-exporter/pkg/exporter/execution"
 )
 
 // Exporter defines the Ethereum Metrics Exporter interface

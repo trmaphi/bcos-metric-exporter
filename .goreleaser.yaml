@@ -24,7 +24,7 @@ builds:
       - goos: windows
         goarch: arm64
     ldflags:
-      - -s -w -X github.com/ethpandaops/ethereum-metrics-exporter/pkg/exporter/version.Release={{.Tag}} -X github.com/ethpandaops/ethereum-metrics-exporter/pkg/exporter/version.GitCommit={{.ShortCommit}}
+      - -s -w -X github.com/trmaphi/bcos-metrics-exporter/pkg/exporter/version.Release={{.Tag}} -X github.com/trmaphi/bcos-metrics-exporter/pkg/exporter/version.GitCommit={{.ShortCommit}}
     mod_timestamp: "{{ .CommitTimestamp }}"
 checksum:
   name_template: 'checksums.txt'

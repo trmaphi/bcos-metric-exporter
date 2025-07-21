@@ -5,16 +5,16 @@ import (
 	"os"
 	"time"
 
-	"github.com/ethpandaops/ethereum-metrics-exporter/pkg/exporter"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"github.com/trmaphi/bcos-metrics-exporter/pkg/exporter"
 	"gopkg.in/yaml.v2"
 )
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "ethereum-metrics-exporter",
-	Short: "A tool to export the state of ethereum nodes",
+	Use:   "bcos-metrics-exporter",
+	Short: "A tool to export the state of fisco bcos nodes",
 	Run: func(cmd *cobra.Command, args []string) {
 		initCommon()
 
