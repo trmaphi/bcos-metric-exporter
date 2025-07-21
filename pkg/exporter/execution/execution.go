@@ -4,8 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/ethereum/go-ethereum/ethclient"
-	"github.com/onrik/ethrpc"
+	"github.com/FISCO-BCOS/go-sdk/v3/client"
 	"github.com/sirupsen/logrus"
 	"github.com/trmaphi/bcos-metrics-exporter/pkg/exporter/execution/api"
 )
@@ -25,29 +24,34 @@ type Node interface {
 }
 
 type node struct {
-	name         string
-	url          string
-	client       *ethclient.Client
-	internalAPI  api.ExecutionClient
-	ethrpcClient *ethrpc.EthRPC
-	log          logrus.FieldLogger
-	metrics      Metrics
+	name        string
+	url         string
+	client      *client.Client
+	internalAPI api.ExecutionClient
+	log         logrus.FieldLogger
+	metrics     Metrics
 }
 
 // NewExecutionNode returns a new execution node.
 func NewExecutionNode(ctx context.Context, log logrus.FieldLogger, namespace, nodeName, url string, enabledModules []string) (Node, error) {
 	internalAPI := api.NewExecutionClient(ctx, log, url)
-	client, _ := ethclient.Dial(url)
-	ethrpcClient := ethrpc.New(url)
-	metrics := NewMetrics(client, internalAPI, ethrpcClient, log, nodeName, namespace, enabledModules)
+	
+	// Initialize FISCO-BCOS client
+	// For FISCO-BCOS, we need to provide groupID and private key
+	// Using default values for now - these should be configurable
+	bcosClient, err := client.Dial(url, "1", []byte{})
+	if err != nil {
+		return nil, err
+	}
+	
+	metrics := NewMetrics(bcosClient, internalAPI, log, nodeName, namespace, enabledModules)
 
 	node := &node{
-		name:         nodeName,
-		url:          url,
-		log:          log,
-		ethrpcClient: ethrpcClient,
-		internalAPI:  internalAPI,
-		client:       client,
+		name:        nodeName,
+		url:         url,
+		log:         log,
+		internalAPI: internalAPI,
+		client:      bcosClient,
 		metrics:      metrics,
 	}
 

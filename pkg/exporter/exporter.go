@@ -7,14 +7,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ethpandaops/beacon/pkg/beacon"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
 	"github.com/trmaphi/bcos-metrics-exporter/pkg/exporter/disk"
 	"github.com/trmaphi/bcos-metrics-exporter/pkg/exporter/execution"
 )
 
-// Exporter defines the Ethereum Metrics Exporter interface
+// Exporter defines the BCOS Metrics Exporter interface
 type Exporter interface {
 	// Init initialises the exporter
 	Init(ctx context.Context) error
@@ -29,7 +28,7 @@ func NewExporter(log logrus.FieldLogger, conf *Config) Exporter {
 	return &exporter{
 		log:       log.WithField("component", "exporter"),
 		config:    conf,
-		namespace: "eth",
+		namespace: "bcos",
 	}
 }
 
@@ -44,7 +43,7 @@ type exporter struct {
 	diskUsage disk.UsageMetrics
 
 	// Clients
-	beacon beacon.Node
+	// BCOS nodes don't have separate consensus clients like Ethereum
 }
 
 func (e *exporter) Init(ctx context.Context) error {
@@ -75,7 +74,7 @@ func (e *exporter) Init(ctx context.Context) error {
 	if e.config.DiskUsage.Enabled {
 		e.log.Info("Initializing disk usage...")
 
-		interval := e.config.DiskUsage.Interval.Duration
+		interval := e.config.DiskUsage.Interval
 		if interval == 0 {
 			interval = 60 * time.Minute
 		}
@@ -103,8 +102,7 @@ func (e *exporter) Config(ctx context.Context) *Config {
 
 func (e *exporter) Serve(ctx context.Context, port int) error {
 	e.log.
-		WithField("consensus_url", e.config.Consensus.URL).
-		WithField("execution_url", e.config.Execution.URL).
+		WithField("bcos_url", e.config.Execution.URL).
 		Info(fmt.Sprintf("Starting metrics server on :%v", port))
 
 	s := &http.Server{
@@ -132,44 +130,6 @@ func (e *exporter) Serve(ctx context.Context, port int) error {
 
 		go e.diskUsage.StartAsync(ctx)
 	}
-
-	if e.config.Consensus.Enabled {
-		e.log.WithField("consensus_url", e.config.Consensus.URL).Info("Starting consensus metrics...")
-
-		if err := e.bootstrapConsensusClients(ctx); err != nil {
-			e.log.WithError(err).Error("failed to bootstrap consensus clients")
-
-			return err
-		}
-
-		go e.beacon.StartAsync(ctx)
-	}
-
-	return nil
-}
-
-func (e *exporter) bootstrapConsensusClients(_ context.Context) error {
-	opts := *beacon.DefaultOptions().
-		EnablePrometheusMetrics()
-
-	if e.config.Consensus.EventStream.Enabled != nil && *e.config.Consensus.EventStream.Enabled {
-		opts.BeaconSubscription.Topics = e.config.Consensus.EventStream.Topics
-
-		if len(opts.BeaconSubscription.Topics) == 0 {
-			opts.EnableDefaultBeaconSubscription()
-		}
-
-		e.log.WithField(
-			"topics", strings.Join(opts.BeaconSubscription.Topics, ", "),
-		).Info("Enabling beacon event stream with topics...")
-
-		opts.BeaconSubscription.Enabled = true
-	}
-
-	e.beacon = beacon.NewNode(e.log, &beacon.Config{
-		Addr: e.config.Consensus.URL,
-		Name: e.config.Consensus.Name,
-	}, "eth_con", opts)
 
 	return nil
 }

@@ -3,8 +3,7 @@ package execution
 import (
 	"context"
 
-	"github.com/ethereum/go-ethereum/ethclient"
-	"github.com/onrik/ethrpc"
+	"github.com/FISCO-BCOS/go-sdk/v3/client"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
 	"github.com/trmaphi/bcos-metrics-exporter/pkg/exporter/execution/api"
@@ -31,21 +30,15 @@ type metrics struct {
 }
 
 // NewMetrics creates a new execution Metrics instance
-func NewMetrics(client *ethclient.Client, internalAPI api.ExecutionClient, ethRPCClient *ethrpc.EthRPC, log logrus.FieldLogger, nodeName, namespace string, enabledModules []string) Metrics {
+func NewMetrics(bcosClient *client.Client, internalAPI api.ExecutionClient, log logrus.FieldLogger, nodeName, namespace string, enabledModules []string) Metrics {
 	constLabels := make(prometheus.Labels)
-	constLabels["ethereum_role"] = "execution"
+	constLabels["bcos_role"] = "execution"
 	constLabels["node_name"] = nodeName
 
 	m := &metrics{
-		log:            log,
-		generalMetrics: jobs.NewGeneralMetrics(client, internalAPI, ethRPCClient, log, namespace, constLabels),
-		syncMetrics:    jobs.NewSyncStatus(client, internalAPI, ethRPCClient, log, namespace, constLabels),
-		txpoolMetrics:  jobs.NewTXPool(client, internalAPI, ethRPCClient, log, namespace, constLabels),
-		adminMetrics:   jobs.NewAdmin(client, internalAPI, ethRPCClient, log, namespace, constLabels),
-		blockMetrics:   jobs.NewBlockMetrics(client, internalAPI, ethRPCClient, log, namespace, constLabels),
-		web3Metrics:    jobs.NewWeb3(client, internalAPI, ethRPCClient, log, namespace, constLabels),
-		netMetrics:     jobs.NewNet(client, internalAPI, ethRPCClient, log, namespace, constLabels),
-
+		log: log,
+		// TODO: Implement BCOS-specific job modules
+		// For now, we'll create stub implementations
 		enabledJobs: make(map[string]bool),
 	}
 
